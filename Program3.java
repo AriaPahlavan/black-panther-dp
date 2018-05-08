@@ -43,65 +43,49 @@ public class Program3 {
         int V = calculator.getNumVibranium();
         int[][] memo = new int[N][V + 1];
 
+
         for (int i = 0; i < N; i++)
-            for (int j = 0; j <= V; j++)
-                memo[i][j] = Integer.MIN_VALUE;
+            memo[i][0] = calculator.calculateGain(i, 0);
 
-        for (int i = 0; i <= V; i++)
-            memo[0][i] = calculator.calculateGain(0, i);
+        for (int j = 0; j <= V; j++)
+            memo[0][j] = calculator.calculateGain(0, j);
 
-        return opt1Rec(N - 1, V, memo);
-/*
-        for (int i = 1; i < N; i++) {
-            int max = 0;
-
-            for (int j = 1; j <= V; j++) {
-                memo[i][j] = Math.max(memo[i-1][j], f(i, j));
-
-                if (memo[i][j] > max)
-                    max = memo[i][j];
-            }
-
-            res[i] = max;
-        }
-
-
-        return res[N-1];
-*/
+        return opt1Iter(N - 1, V, memo);
     }
 
     /**
      * Iterative solution to Compute Gain problem
      *
-     * @param N number of projects
-     * @param V amount Vibranium available
+     * @param N    number of projects
+     * @param V    amount Vibranium available
      * @param memo memoization table to be used
      * @return max economical gain
      */
     private int opt1Iter(int N, int V, int[][] memo) {
+        for (int n = 1; n <= N; n++)
+            for (int v = 1; v <= V; v++) {
+                int max = Integer.MIN_VALUE;
 
-        for (int n = 1; n < N; n++) {
-            for (int v = 0; v <= V; v++) {
+                for (int j = 0; j <= v; j++)
+                    max = Math.max(max, memo[n-1][v-j] + f(n, j));
 
+                memo[n][v] = max;
             }
-        }
 
-        return 0;
+        return memo[N][V];
     }
-
 
     /**
      * Recursive solution to Compute Gain problem
      *
-     * @param N number of projects
-     * @param V amount Vibranium available
+     * @param N    number of projects
+     * @param V    amount Vibranium available
      * @param memo memoization table to be used
      * @return max economical gain
      */
     private int opt1Rec(int N, int V, int[][] memo) {
         if (N < 0 || V < 1) return 0;
         if (memo[N][V] != Integer.MIN_VALUE) return memo[N][V];
-//        if (V == 1) return Math.max(f(N, 1), memo[N - 1][1]);
 
         int max = Integer.MIN_VALUE;
 
@@ -109,8 +93,7 @@ public class Program3 {
             if (memo[N - 1][j] == Integer.MIN_VALUE)
                 memo[N - 1][j] = opt1Rec(N - 1, j, memo);
 
-            max = Math.max(max, memo[N - 1][j] + f(N, V - j)
-            );
+            max = Math.max(max, memo[N - 1][j] + f(N, V - j));
         }
 
         memo[N][V] = max;
